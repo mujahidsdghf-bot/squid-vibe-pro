@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squid Vibe Pro - Instagram Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Billabong&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #fafafa; color: #262626; margin: 0; padding-bottom: 60px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Billabong', cursive; font-size: 32px; margin: 0; cursor: pointer; }
+        
+        .feed { max-width: 470px; margin: 20px auto; }
+        .post { background: #fff; border: 1px solid #dbdbdb; border-radius: 8px; margin-bottom: 20px; }
+        .post-header { display: flex; align-items: center; justify-content: space-between; padding: 12px; font-weight: 600; font-size: 13px; }
+        .follow-btn { background: #0095f6; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+        
+        video { width: 100%; max-height: 500px; background: #000; display: block; }
+        .actions { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 22px; }
+        .actions-left span { margin-right: 15px; cursor: pointer; }
+        .meta { padding: 0 14px 14px 14px; font-size: 13px; }
+
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; height: 50px; align-items: center; font-size: 24px; z-index: 1000; }
+        
+        .upload-box { max-width: 450px; margin: 40px auto; background: #fff; padding: 20px; border: 1px solid #dbdbdb; border-radius: 8px; text-align: center; }
+        .upload-box input { width: 100%; margin: 10px 0; }
+        .upload-btn { background: #0095f6; color: #fff; border: none; width: 100%; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="logo" onclick="switchTab('feed')">Squid Vibe</h1>
+        <div>
+            <span onclick="switchTab('upload')" style="cursor:pointer; font-size:22px;">➕</span>
+        </div>
+    </header>
+
+    <!-- FEED TAB -->
+    <div id="feedTab" class="feed">
+        <div id="postsContainer">Loading professional feed...</div>
+    </div>
+
+    <!-- UPLOAD TAB (Direct Cloud Studio) -->
+    <div id="uploadTab" class="feed hidden">
+        <div class="upload-box">
+            <h3>Pro Video Studio</h3>
+            <input type="file" id="videoFile" accept="video/mp4"><br>
+            <select id="audioSelect" style="width:100%; padding:8px; margin:10px 0;">
+                <option>🎵 Original Audio</option>
+                <option>🔥 Viral Lo-Fi Beat</option>
+                <option>💖 Cinematic Acoustic</option>
+            </select><br>
+            <input type="text" id="captionText" placeholder="Write a caption..." style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;"><br>
+            <button class="upload-btn" onclick="uploadVideo()">Publish to Cloud 🚀</button>
+            <p id="uploadStatus" style="font-size:12px; color:#0095f6; margin-top:10px;"></p>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="nav-bar">
+        <span onclick="switchTab('feed')">🏠</span>
+        <span onclick="switchTab('upload')">➕</span>
+        <span onclick="alert('Profile Tab')">👤</span>
+    </nav>
+
+    <script>
+        function switchTab(tab) {
+            document.getElementById('feedTab').classList.add('hidden');
+            document.getElementById('uploadTab').classList.add('hidden');
+            if(tab === 'feed') {
+                document.getElementById('feedTab').classList.remove('hidden');
+                loadFeed();
+            }
+            if(tab === 'upload') {
+                document.getElementById('uploadTab').classList.remove('hidden');
+            }
+        }
+
+        async function loadFeed() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = "Fetching from AWS S3 CDN...";
+            try {
+                const res = await fetch('/api/videos');
+                const data = await res.json();
+                container.innerHTML = "";
+                if(data.videos && data.videos.length > 0) {
+                    data.videos.forEach(v => {
+                        container.innerHTML += `
+                            <div class="post">
+                                <div class="post-header">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <div style="width:28px; height:28px; background:linear-gradient(45deg,#f09433,#dc2743); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px;">SV</div>
+                                        <span>squid_creator</span>
+                                    </div>
+                                    <button class="follow-btn" onclick="this.innerText = this.innerText === 'Follow' ? 'Following' : 'Follow'; this.style.background = this.innerText === 'Following' ? '#efefef' : '#0095f6'; this.style.color = this.innerText === 'Following' ? '#000' : '#fff';">Follow</button>
+                                </div>
+                                <video controls preload="metadata" playsinline>
+                                    <source src="${v.url}" type="video/mp4">
+                                </video>
+                                <div class="actions">
+                                    <div class="actions-left">
+                                        <span onclick="likePost('${v.file_name}')">🤍 ${v.likes}</span>
+                                        <span>💬</span>
+                                        <span>✈️</span>
+                                    </div>
+                                    <span>🔖</span>
+                                </div>
+                                <div class="meta"><b>squid_creator</b> Amazing vibe! 🔥</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = "<p style='text-align:center; color:#777;'>No posts found. Upload one!</p>";
+                }
+            } catch(err) {
+                container.innerHTML = "<p style='text-align:center; color:red;'>Failed to load feed.</p>";
+            }
+        }
+
+        async function uploadVideo() {
+            const fileInput = document.getElementById('videoFile');
+            const status = document.getElementById('uploadStatus');
+            if(fileInput.files.length === 0) { alert('Please select a video!'); return; }
+
+            const file = fileInput.files[0];
+            status.innerText = "Requesting secure cloud channel...";
+
+            try {
+                // 1. Get Signed URL
+                const res = await fetch('/api/get-upload-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: file.name })
+                });
+                const data = await res.json();
+                if(!data.success) throw new Error("Cloud handshake failed");
+
+                status.innerText = "Uploading directly to AWS S3 (High Speed)...";
+
+                // 2. Direct S3 Upload
+                const s3Res = await fetch(data.uploadUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'video/mp4' },
+                    body: file
+                });
+
+                if(s3Res.ok) {
+                    status.innerText = "Published Successfully! 🎉";
+                    fileInput.value = '';
+                    setTimeout(() => switchTab('feed'), 1200);
+                } else {
+                    status.innerText = "Cloud storage rejected upload.";
+                }
+            } catch(err) {
+                status.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function likePost(fileName) {
+            await fetch('/api/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file_name: fileName })
+            });
+            loadFeed();
+        }
+
+        // Initial Load
+        loadFeed();
+    </script>
+</body>
+</html>
