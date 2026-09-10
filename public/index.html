@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squid Vibe Pro - Instagram Experience</title>
-    <link href="https://fonts.googleapis.com/css2?family=Billabong&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Squid Vibe - Instagram Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Billabong&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background: #fafafa; color: #262626; margin: 0; padding-bottom: 70px; }
         
         /* Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
         .logo { font-family: 'Billabong', cursive; font-size: 32px; margin: 0; cursor: pointer; color: #000; }
-        .header-icons span { font-size: 22px; margin-left: 15px; cursor: pointer; }
+        .header-icons { display: flex; gap: 18px; align-items: center; }
+        .header-icons svg { width: 24px; height: 24px; cursor: pointer; stroke: #000; fill: none; stroke-width: 2; }
 
         /* Stories Tray */
         .stories-tray { display: flex; gap: 12px; padding: 10px 15px; background: #fff; border-bottom: 1px solid #dbdbdb; overflow-x: auto; }
         .story-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; flex-shrink: 0; }
         .story-ring { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2px; display: flex; align-items: center; justify-content: center; }
-        .story-inner { width: 60px; height: 60px; border-radius: 50%; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+        .story-inner { width: 60px; height: 60px; border-radius: 50%; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; font-size: 22px; }
         .story-inner img { width: 100%; height: 100%; object-fit: cover; }
         .story-text { font-size: 11px; margin-top: 4px; color: #262626; }
 
@@ -33,23 +34,24 @@
 
         /* Media & Ads */
         .media-box { position: relative; width: 100%; background: #000; min-height: 300px; display: flex; align-items: center; justify-content: center; }
-        video, img.post-img { width: 100%; max-height: 500px; object-fit: contain; display: block; background: #000; }
-        .watermark { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; backdrop-filter: blur(4px); }
+        video, img.post-img { width: 100%; max-height: 500px; object-fit: contain; display: block; background: #000; outline: none; }
+        .watermark { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; backdrop-filter: blur(4px); z-index: 5; }
         
         .ad-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; z-index: 10; text-align: center; padding: 20px; }
         .skip-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: 1px solid #fff; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 12px; cursor: pointer; }
 
         /* Actions & Meta */
         .post-actions { display: flex; justify-content: space-between; padding: 10px 14px; align-items: center; }
-        .actions-left { display: flex; gap: 16px; font-size: 22px; cursor: pointer; }
+        .actions-left { display: flex; gap: 16px; align-items: center; cursor: pointer; }
+        .actions-left svg, .post-actions svg { width: 24px; height: 24px; stroke: #000; fill: none; stroke-width: 2; transition: transform 0.1s; }
+        .actions-left svg:active { transform: scale(1.2); }
         .post-meta { padding: 0 14px 12px 14px; font-size: 13px; }
         .views-count { font-size: 11px; color: #8e8e8e; padding: 0 14px 8px 14px; }
 
-        /* Instagram Studio / Upload View */
+        /* Studio View */
         .studio-box { max-width: 450px; margin: 20px auto; background: #fff; padding: 20px; border: 1px solid #dbdbdb; border-radius: 12px; }
         .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
         .tool-btn { background: #f0f0f0; border: 1px solid #dbdbdb; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
-        .tool-btn:active { background: #e0e0e0; }
 
         /* Profile View */
         .profile-header { padding: 20px; background: #fff; border-bottom: 1px solid #dbdbdb; }
@@ -63,8 +65,9 @@
         .grid-item video, .grid-item img { width: 100%; height: 100%; object-fit: cover; }
 
         /* Bottom Nav Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; align-items: center; z-index: 1000; font-size: 24px; }
-        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .bottom-nav svg { width: 26px; height: 26px; stroke: #000; fill: none; stroke-width: 2; cursor: pointer; }
+
         .hidden { display: none; }
         input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #dbdbdb; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; outline: none; font-size: 13px; }
     </style>
@@ -75,8 +78,8 @@
     <header>
         <h1 class="logo" onclick="switchView('feed')">Squid Vibe</h1>
         <div class="header-icons">
-            <span onclick="switchView('upload')">➕</span>
-            <span onclick="switchView('profile')">👤</span>
+            <svg onclick="switchView('upload')" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+            <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
         </div>
     </header>
 
@@ -96,11 +99,11 @@
         <div id="postsContainer">Loading professional feed...</div>
     </div>
 
-    <!-- UPLOAD / INSTAGRAM STUDIO VIEW -->
+    <!-- UPLOAD VIEW -->
     <div id="uploadView" class="feed-container hidden">
         <div class="studio-box">
             <h3 style="margin-top:0;">Instagram Creator Studio 🎨</h3>
-            <label style="font-size:12px; color:#8e8e8e;">Select Photo / Video:</label>
+            <label style="font-size:12px; color:#8e8e8e;">Select Photo / Video (.mp4):</label>
             <input type="file" id="mediaFile" accept="image/*,video/*"><br>
 
             <div class="tools-grid">
@@ -145,11 +148,18 @@
         <div class="profile-grid" id="profileGrid"></div>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR -->
+    <!-- BOTTOM NAVIGATION BAR (Original Instagram Icons) -->
     <nav class="bottom-nav">
-        <span onclick="switchView('feed')">🏠</span>
-        <span onclick="switchView('upload')">➕</span>
-        <span onclick="switchView('profile')">👤</span>
+        <!-- Home Icon -->
+        <svg onclick="switchView('feed')" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <!-- Search Icon -->
+        <svg onclick="alert('Search Tab')" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <!-- Add / Upload Icon -->
+        <svg onclick="switchView('upload')" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <!-- Reels / Video Icon -->
+        <svg onclick="alert('Reels Tab')" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <!-- Profile Icon -->
+        <svg onclick="switchView('profile')" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     </nav>
 
     <script>
@@ -179,8 +189,8 @@
             else if(tool === '🎵 Music') { cap.value += " 🎵 [Trending Audio]"; alert("Music track added!"); }
             else if(tool === '✨ Effects') { alert("Cinematic filter effects applied!"); }
             else if(tool === '@ Mention') { cap.value += " @"; cap.focus(); }
-            else if(tool === '✏️ Draw') { alert("Draw mode activated! You can sketch over media."); }
-            else if(tool === '📥 Save') { alert("Saved to device & draft successfully!"); }
+            else if(tool === '✏️ Draw') { alert("Draw mode activated!"); }
+            else if(tool === '📥 Save') { alert("Saved successfully!"); }
         }
 
         async function uploadStory(event) {
@@ -310,8 +320,10 @@
                                     <h3>📢 Sponsored Ad</h3>
                                     <p style="font-size:12px;">Monetization Active</p>
                                 </div>
+                                <!-- Optimized video player to prevent buffering & ensure smooth streaming -->
                                 <video controls preload="metadata" playsinline onplay="initAd('${adId}')">
                                     <source src="${v.url}" type="video/mp4">
+                                    Your browser does not support video playback.
                                 </video>
                             </div>`;
 
@@ -327,11 +339,15 @@
                                 ${mediaHtml}
                                 <div class="post-actions">
                                     <div class="actions-left">
-                                        <span onclick="likePost('${v.file_name}')">🤍 ${v.likes}</span>
-                                        <span>💬</span>
-                                        <span>✈️</span>
+                                        <!-- Like SVG -->
+                                        <svg onclick="likePost('${v.file_name}')" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                        <!-- Comment SVG -->
+                                        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                        <!-- Share SVG -->
+                                        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                                     </div>
-                                    <span>🔖</span>
+                                    <!-- Save SVG -->
+                                    <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                                 </div>
                                 <div class="views-count">👀 1,420 views</div>
                                 <div class="post-meta"><b>${currentUser}</b> Vibe check 🔥 #SquidVibe</div>
