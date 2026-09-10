@@ -21,11 +21,12 @@ let db = {
     users: {}
 };
 
-// 1. Instagram Style Pre-signed URL Generator (Direct Cloud Upload - No Server Lag)
+// 1. Generate Pre-signed URL with strict video/mp4 type
 app.post('/api/get-upload-url', async (req, res) => {
     try {
         const { filename } = req.body;
-        const key = `uploads/${Date.now()}_${filename}`;
+        const cleanName = filename.replace(/[^a-zA-Z0-9_.-]/g, '_');
+        const key = `uploads/${Date.now()}_${cleanName}`;
         
         const s3Params = {
             Bucket: BUCKET_NAME,
@@ -41,7 +42,7 @@ app.post('/api/get-upload-url', async (req, res) => {
     }
 });
 
-// 2. Fetch All Videos with CDN URL
+// 2. Fetch All Videos from S3
 app.get('/api/videos', async (req, res) => {
     try {
         const data = await s3.listObjectsV2({ Bucket: BUCKET_NAME, Prefix: 'uploads/' }).promise();
@@ -49,7 +50,6 @@ app.get('/api/videos', async (req, res) => {
             if (item.Key === 'uploads/') return null;
             const url = `https://${BUCKET_NAME}.s3.eu-north-1.amazonaws.com/${item.Key}`;
             
-            // Find or init meta
             let meta = db.videos.find(v => v.file_name === item.Key) || { file_name: item.Key, likes: 0, comments: [] };
             return {
                 file_name: item.Key,
@@ -76,19 +76,6 @@ app.post('/api/like', (req, res) => {
         vid.likes += 1;
     }
     res.json({ success: true, likes: vid.likes });
-});
-
-// 4. Comment System
-app.post('/api/comment', (req, res) => {
-    const { file_name, comment } = req.body;
-    let vid = db.videos.find(v => v.file_name === file_name);
-    if (!vid) {
-        vid = { file_name, likes: 0, comments: [comment] };
-        db.videos.push(vid);
-    } else {
-        vid.comments.push(comment);
-    }
-    res.json({ success: true, comments: vid.comments });
 });
 
 const PORT = process.env.PORT || 3000;
