@@ -7,7 +7,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// AWS S3 Configuration
 const s3 = new AWS.S3({
     region: 'eu-north-1',
     accessKeyId: 'AKIAXQ7HHUFVJD7VMFJI',
@@ -16,12 +15,6 @@ const s3 = new AWS.S3({
 
 const BUCKET_NAME = 'squid-vibe-storage-2026';
 
-let db = {
-    videos: [],
-    users: {}
-};
-
-// 1. Generate Pre-signed URL with strict video/mp4 type
 app.post('/api/get-upload-url', async (req, res) => {
     try {
         const { filename } = req.body;
@@ -42,21 +35,28 @@ app.post('/api/get-upload-url', async (req, res) => {
     }
 });
 
-// 2. Fetch All Videos from S3
+// Delete Video API from AWS S3
+app.post('/api/delete', async (req, res) => {
+    try {
+        const { file_name } = req.body;
+        const deleteParams = {
+            Bucket: BUCKET_NAME,
+            Key: file_name
+        };
+        await s3.deleteObject(deleteParams).promise();
+        res.json({ success: true, message: "Deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 app.get('/api/videos', async (req, res) => {
     try {
         const data = await s3.listObjectsV2({ Bucket: BUCKET_NAME, Prefix: 'uploads/' }).promise();
         let videos = data.Contents.map(item => {
             if (item.Key === 'uploads/') return null;
             const url = `https://${BUCKET_NAME}.s3.eu-north-1.amazonaws.com/${item.Key}`;
-            
-            let meta = db.videos.find(v => v.file_name === item.Key) || { file_name: item.Key, likes: 0, comments: [] };
-            return {
-                file_name: item.Key,
-                url: url,
-                likes: meta.likes,
-                comments: meta.comments
-            };
+            return { file_name: item.Key, url: url };
         }).filter(Boolean);
 
         res.json({ success: true, videos });
@@ -65,18 +65,5 @@ app.get('/api/videos', async (req, res) => {
     }
 });
 
-// 3. Like System
-app.post('/api/like', (req, res) => {
-    const { file_name } = req.body;
-    let vid = db.videos.find(v => v.file_name === file_name);
-    if (!vid) {
-        vid = { file_name, likes: 1, comments: [] };
-        db.videos.push(vid);
-    } else {
-        vid.likes += 1;
-    }
-    res.json({ success: true, likes: vid.likes });
-});
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Squid Vibe Pro Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
