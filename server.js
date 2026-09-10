@@ -15,6 +15,7 @@ const s3 = new AWS.S3({
 
 const BUCKET_NAME = 'squid-vibe-storage-2026';
 
+// 1. Upload URL Generator with strict video/mp4 format
 app.post('/api/get-upload-url', async (req, res) => {
     try {
         const { filename } = req.body;
@@ -35,26 +36,28 @@ app.post('/api/get-upload-url', async (req, res) => {
     }
 });
 
-// Delete Video API from AWS S3
+// 2. Delete Video API
 app.post('/api/delete', async (req, res) => {
     try {
         const { file_name } = req.body;
-        const deleteParams = {
-            Bucket: BUCKET_NAME,
-            Key: file_name
-        };
-        await s3.deleteObject(deleteParams).promise();
+        await s3.deleteObject({ Bucket: BUCKET_NAME, Key: file_name }).promise();
         res.json({ success: true, message: "Deleted successfully" });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
+// 3. Fetch ONLY Video Files (Filtering out non-video formats)
 app.get('/api/videos', async (req, res) => {
     try {
         const data = await s3.listObjectsV2({ Bucket: BUCKET_NAME, Prefix: 'uploads/' }).promise();
         let videos = data.Contents.map(item => {
             if (item.Key === 'uploads/') return null;
+            
+            // Accept only video formats
+            const isVideo = /\.(mp4|mov|webm|m4v|avi)$/i.test(item.Key);
+            if (!isVideo) return null;
+
             const url = `https://${BUCKET_NAME}.s3.eu-north-1.amazonaws.com/${item.Key}`;
             return { file_name: item.Key, url: url };
         }).filter(Boolean);
