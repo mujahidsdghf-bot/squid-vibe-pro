@@ -4,143 +4,249 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Squid Vibe Pro - Instagram Experience</title>
-    <link href="https://fonts.googleapis.com/css2?family=Billabong&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Billabong&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #fafafa; color: #262626; margin: 0; padding-bottom: 60px; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
-        .logo { font-family: 'Billabong', cursive; font-size: 32px; margin: 0; cursor: pointer; }
+        body { font-family: 'Poppins', sans-serif; background: #fafafa; color: #262626; margin: 0; padding-bottom: 70px; }
         
-        .feed { max-width: 470px; margin: 20px auto; }
-        .post { background: #fff; border: 1px solid #dbdbdb; border-radius: 8px; margin-bottom: 20px; }
-        .post-header { display: flex; align-items: center; justify-content: space-between; padding: 12px; font-weight: 600; font-size: 13px; }
-        .follow-btn { background: #0095f6; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; }
-        
-        video { width: 100%; max-height: 500px; background: #000; display: block; }
-        .actions { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 22px; }
-        .actions-left span { margin-right: 15px; cursor: pointer; }
-        .meta { padding: 0 14px 14px 14px; font-size: 13px; }
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Billabong', cursive; font-size: 32px; margin: 0; cursor: pointer; color: #000; }
+        .header-icons span { font-size: 22px; margin-left: 15px; cursor: pointer; }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; height: 50px; align-items: center; font-size: 24px; z-index: 1000; }
+        /* Stories Tray */
+        .stories-tray { display: flex; gap: 12px; padding: 10px 15px; background: #fff; border-bottom: 1px solid #dbdbdb; overflow-x: auto; }
+        .story-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; flex-shrink: 0; }
+        .story-ring { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2px; display: flex; align-items: center; justify-content: center; }
+        .story-inner { width: 60px; height: 60px; border-radius: 50%; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+        .story-inner img { width: 100%; height: 100%; object-fit: cover; }
+        .story-text { font-size: 11px; margin-top: 4px; color: #262626; }
+
+        /* Feed & Posts */
+        .feed-container { max-width: 470px; margin: 15px auto; }
+        .post-card { background: #fff; border: 1px solid #dbdbdb; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+        .post-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; }
+        .post-user { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
+        .post-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(45deg, #f09433, #dc2743); overflow: hidden; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+        .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .follow-btn { background: #0095f6; color: #fff; border: none; padding: 4px 14px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; }
+        .follow-btn.following { background: #efefef; color: #262626; }
+
+        /* Media & Ads */
+        .media-box { position: relative; width: 100%; background: #000; min-height: 300px; display: flex; align-items: center; justify-content: center; }
+        video, img.post-img { width: 100%; max-height: 500px; object-fit: contain; display: block; background: #000; }
+        .watermark { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; backdrop-filter: blur(4px); }
         
-        .upload-box { max-width: 450px; margin: 40px auto; background: #fff; padding: 20px; border: 1px solid #dbdbdb; border-radius: 8px; text-align: center; }
-        .upload-box input { width: 100%; margin: 10px 0; }
-        .upload-btn { background: #0095f6; color: #fff; border: none; width: 100%; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .ad-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; z-index: 10; text-align: center; padding: 20px; }
+        .skip-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: 1px solid #fff; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+
+        /* Actions & Meta */
+        .post-actions { display: flex; justify-content: space-between; padding: 10px 14px; align-items: center; }
+        .actions-left { display: flex; gap: 16px; font-size: 22px; cursor: pointer; }
+        .post-meta { padding: 0 14px 12px 14px; font-size: 13px; }
+        .views-count { font-size: 11px; color: #8e8e8e; padding: 0 14px 8px 14px; }
+
+        /* Instagram Studio / Upload View */
+        .studio-box { max-width: 450px; margin: 20px auto; background: #fff; padding: 20px; border: 1px solid #dbdbdb; border-radius: 12px; }
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+        .tool-btn { background: #f0f0f0; border: 1px solid #dbdbdb; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
+        .tool-btn:active { background: #e0e0e0; }
+
+        /* Profile View */
+        .profile-header { padding: 20px; background: #fff; border-bottom: 1px solid #dbdbdb; }
+        .profile-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .profile-big-avatar { width: 80px; height: 80px; border-radius: 50%; background: #dbdbdb; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid #ed4956; }
+        .profile-big-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-stats { display: flex; gap: 20px; text-align: center; font-size: 13px; }
+        .profile-stats b { font-size: 16px; display: block; }
+        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 10px; }
+        .grid-item { aspect-ratio: 1; background: #eee; overflow: hidden; }
+        .grid-item video, .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Bottom Nav Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #fff; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; align-items: center; z-index: 1000; font-size: 24px; }
         
         .hidden { display: none; }
+        input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #dbdbdb; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; outline: none; font-size: 13px; }
     </style>
 </head>
 <body>
 
+    <!-- HEADER -->
     <header>
-        <h1 class="logo" onclick="switchTab('feed')">Squid Vibe</h1>
-        <div>
-            <span onclick="switchTab('upload')" style="cursor:pointer; font-size:22px;">➕</span>
+        <h1 class="logo" onclick="switchView('feed')">Squid Vibe</h1>
+        <div class="header-icons">
+            <span onclick="switchView('upload')">➕</span>
+            <span onclick="switchView('profile')">👤</span>
         </div>
     </header>
 
-    <!-- FEED TAB -->
-    <div id="feedTab" class="feed">
+    <!-- STORIES TRAY -->
+    <div class="stories-tray" id="storiesTray">
+        <div class="story-item" onclick="document.getElementById('storyInput').click()">
+            <div class="story-ring">
+                <div class="story-inner" id="myStoryAvatar">➕</div>
+            </div>
+            <span class="story-text">Your Story</span>
+        </div>
+        <input type="file" id="storyInput" accept="image/*,video/*" style="display:none" onchange="uploadStory(event)">
+    </div>
+
+    <!-- FEED VIEW -->
+    <div id="feedView" class="feed-container">
         <div id="postsContainer">Loading professional feed...</div>
     </div>
 
-    <!-- UPLOAD TAB (Direct Cloud Studio) -->
-    <div id="uploadTab" class="feed hidden">
-        <div class="upload-box">
-            <h3>Pro Video Studio</h3>
-            <input type="file" id="videoFile" accept="video/mp4"><br>
-            <select id="audioSelect" style="width:100%; padding:8px; margin:10px 0;">
-                <option>🎵 Original Audio</option>
-                <option>🔥 Viral Lo-Fi Beat</option>
-                <option>💖 Cinematic Acoustic</option>
-            </select><br>
-            <input type="text" id="captionText" placeholder="Write a caption..." style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;"><br>
-            <button class="upload-btn" onclick="uploadVideo()">Publish to Cloud 🚀</button>
-            <p id="uploadStatus" style="font-size:12px; color:#0095f6; margin-top:10px;"></p>
+    <!-- UPLOAD / INSTAGRAM STUDIO VIEW -->
+    <div id="uploadView" class="feed-container hidden">
+        <div class="studio-box">
+            <h3 style="margin-top:0;">Instagram Creator Studio 🎨</h3>
+            <label style="font-size:12px; color:#8e8e8e;">Select Photo / Video:</label>
+            <input type="file" id="mediaFile" accept="image/*,video/*"><br>
+
+            <div class="tools-grid">
+                <div class="tool-btn" onclick="applyTool('🎵 Music')">🎵 Music</div>
+                <div class="tool-btn" onclick="applyTool('✨ Effects')">✨ Effects</div>
+                <div class="tool-btn" onclick="applyTool('🤖 AI Label')">🤖 AI Label</div>
+                <div class="tool-btn" onclick="applyTool('@ Mention')">@ Mention</div>
+                <div class="tool-btn" onclick="applyTool('✏️ Draw')">✏️ Draw</div>
+                <div class="tool-btn" onclick="applyTool('📥 Save')">📥 Save</div>
+            </div>
+
+            <input type="text" id="captionInput" placeholder="Write a caption with #tags & emojis 🔥🚀">
+            <button onclick="publishMedia()" style="width:100%; background:#0095f6; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer;">Share to Squid Vibe 🚀</button>
+            <p id="uploadStatus" style="text-align:center; font-size:12px; color:#0095f6; margin-top:10px;"></p>
         </div>
     </div>
 
-    <!-- BOTTOM NAV -->
-    <nav class="nav-bar">
-        <span onclick="switchTab('feed')">🏠</span>
-        <span onclick="switchTab('upload')">➕</span>
-        <span onclick="alert('Profile Tab')">👤</span>
+    <!-- PROFILE VIEW -->
+    <div id="profileView" class="feed-container hidden">
+        <div class="profile-header">
+            <div class="profile-row">
+                <div class="profile-big-avatar" id="profileBigAvatar">SV</div>
+                <div class="profile-stats">
+                    <div><b id="userPostCount">0</b>posts</div>
+                    <div><b>1.4K</b>followers</div>
+                    <div><b>42</b>following</div>
+                </div>
+            </div>
+            <div style="font-weight:600; font-size:14px;" id="profileNameDisplay">Squid Creator</div>
+            <div style="font-size:13px; color:#555; margin-bottom:12px;" id="profileBioDisplay">Official Creator Hub ⚡ Powered by AWS S3.</div>
+            
+            <button onclick="toggleSettings()" style="width:100%; background:#efefef; border:1px solid #dbdbdb; padding:8px; border-radius:6px; font-weight:600; cursor:pointer; margin-bottom:10px;">⚙️ Edit Profile & Settings</button>
+
+            <div id="settingsBox" class="hidden" style="background:#fafafa; padding:12px; border:1px solid #dbdbdb; border-radius:8px; margin-top:10px;">
+                <input type="text" id="editName" placeholder="Change Name">
+                <input type="text" id="editBio" placeholder="Change Bio">
+                <label style="font-size:12px; color:#8e8e8e;">Profile Picture:</label>
+                <input type="file" id="editPic" accept="image/*" onchange="previewAvatar(event)">
+                <button onclick="saveSettings()" style="width:100%; background:#0095f6; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:600; cursor:pointer; margin-top:5px;">Save Changes</button>
+            </div>
+        </div>
+        <div class="profile-grid" id="profileGrid"></div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav">
+        <span onclick="switchView('feed')">🏠</span>
+        <span onclick="switchView('upload')">➕</span>
+        <span onclick="switchView('profile')">👤</span>
     </nav>
 
     <script>
-        function switchTab(tab) {
-            document.getElementById('feedTab').classList.add('hidden');
-            document.getElementById('uploadTab').classList.add('hidden');
-            if(tab === 'feed') {
-                document.getElementById('feedTab').classList.remove('hidden');
+        let currentUser = "squid_creator";
+        let userBio = "Official Creator Hub ⚡ Powered by AWS S3.";
+        let userAvatar = null;
+        let allVideos = [];
+
+        function switchView(view) {
+            ['feedView', 'uploadView', 'profileView'].forEach(v => {
+                document.getElementById(v).classList.add('hidden');
+            });
+            if(view === 'feed') {
+                document.getElementById('feedView').classList.remove('hidden');
                 loadFeed();
             }
-            if(tab === 'upload') {
-                document.getElementById('uploadTab').classList.remove('hidden');
+            if(view === 'upload') document.getElementById('uploadView').classList.remove('hidden');
+            if(view === 'profile') {
+                document.getElementById('profileView').classList.remove('hidden');
+                loadProfile();
             }
         }
 
-        async function loadFeed() {
-            const container = document.getElementById('postsContainer');
-            container.innerHTML = "Fetching from AWS S3 CDN...";
-            try {
-                const res = await fetch('/api/videos');
-                const data = await res.json();
-                container.innerHTML = "";
-                if(data.videos && data.videos.length > 0) {
-                    data.videos.forEach(v => {
-                        container.innerHTML += `
-                            <div class="post">
-                                <div class="post-header">
-                                    <div style="display:flex; align-items:center; gap:8px;">
-                                        <div style="width:28px; height:28px; background:linear-gradient(45deg,#f09433,#dc2743); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px;">SV</div>
-                                        <span>squid_creator</span>
-                                    </div>
-                                    <button class="follow-btn" onclick="this.innerText = this.innerText === 'Follow' ? 'Following' : 'Follow'; this.style.background = this.innerText === 'Following' ? '#efefef' : '#0095f6'; this.style.color = this.innerText === 'Following' ? '#000' : '#fff';">Follow</button>
-                                </div>
-                                <video controls preload="metadata" playsinline>
-                                    <source src="${v.url}" type="video/mp4">
-                                </video>
-                                <div class="actions">
-                                    <div class="actions-left">
-                                        <span onclick="likePost('${v.file_name}')">🤍 ${v.likes}</span>
-                                        <span>💬</span>
-                                        <span>✈️</span>
-                                    </div>
-                                    <span>🔖</span>
-                                </div>
-                                <div class="meta"><b>squid_creator</b> Amazing vibe! 🔥</div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    container.innerHTML = "<p style='text-align:center; color:#777;'>No posts found. Upload one!</p>";
-                }
-            } catch(err) {
-                container.innerHTML = "<p style='text-align:center; color:red;'>Failed to load feed.</p>";
+        function applyTool(tool) {
+            const cap = document.getElementById('captionInput');
+            if(tool === '🤖 AI Label') { cap.value += " #AI 🤖"; alert("Meta AI Label applied!"); }
+            else if(tool === '🎵 Music') { cap.value += " 🎵 [Trending Audio]"; alert("Music track added!"); }
+            else if(tool === '✨ Effects') { alert("Cinematic filter effects applied!"); }
+            else if(tool === '@ Mention') { cap.value += " @"; cap.focus(); }
+            else if(tool === '✏️ Draw') { alert("Draw mode activated! You can sketch over media."); }
+            else if(tool === '📥 Save') { alert("Saved to device & draft successfully!"); }
+        }
+
+        async function uploadStory(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('myStoryAvatar').innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; border-radius:50%;">`;
+                    alert("Story added successfully! 🌟");
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        async function uploadVideo() {
-            const fileInput = document.getElementById('videoFile');
+        function toggleSettings() {
+            const box = document.getElementById('settingsBox');
+            box.classList.toggle('hidden');
+            document.getElementById('editName').value = currentUser;
+            document.getElementById('editBio').value = userBio;
+        }
+
+        let tempAvatar = null;
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) { tempAvatar = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveSettings() {
+            currentUser = document.getElementById('editName').value || currentUser;
+            userBio = document.getElementById('editBio').value || userBio;
+            if(tempAvatar) userAvatar = tempAvatar;
+
+            document.getElementById('profileNameDisplay').innerText = currentUser;
+            document.getElementById('profileBioDisplay').innerText = userBio;
+            if(userAvatar) {
+                document.getElementById('profileBigAvatar').innerHTML = `<img src="${userAvatar}">`;
+                document.getElementById('myStoryAvatar').innerHTML = `<img src="${userAvatar}" style="width:100%; height:100%; border-radius:50%;">`;
+            }
+            document.getElementById('settingsBox').classList.add('hidden');
+            alert("Profile settings saved! 🎉");
+            loadFeed();
+        }
+
+        async function publishMedia() {
+            const fileInput = document.getElementById('mediaFile');
             const status = document.getElementById('uploadStatus');
-            if(fileInput.files.length === 0) { alert('Please select a video!'); return; }
+            if(fileInput.files.length === 0) { alert('Please select a file!'); return; }
 
             const file = fileInput.files[0];
-            status.innerText = "Requesting secure cloud channel...";
+            status.innerText = "Connecting to Cloud Studio...";
 
             try {
-                // 1. Get Signed URL
                 const res = await fetch('/api/get-upload-url', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ filename: file.name })
                 });
                 const data = await res.json();
-                if(!data.success) throw new Error("Cloud handshake failed");
+                if(!data.success) throw new Error("Upload token failed");
 
-                status.innerText = "Uploading directly to AWS S3 (High Speed)...";
+                status.innerText = "Uploading directly to AWS S3...";
 
-                // 2. Direct S3 Upload
                 const s3Res = await fetch(data.uploadUrl, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'video/mp4' },
@@ -150,13 +256,25 @@
                 if(s3Res.ok) {
                     status.innerText = "Published Successfully! 🎉";
                     fileInput.value = '';
-                    setTimeout(() => switchTab('feed'), 1200);
+                    document.getElementById('captionInput').value = '';
+                    setTimeout(() => switchView('feed'), 1000);
                 } else {
-                    status.innerText = "Cloud storage rejected upload.";
+                    status.innerText = "Cloud upload failed.";
                 }
             } catch(err) {
                 status.innerText = "Error: " + err.message;
             }
+        }
+
+        function initAd(adId) {
+            setTimeout(() => {
+                const ad = document.getElementById(adId);
+                if(ad) ad.style.display = 'flex';
+            }, 5000); // 5 seconds ad start
+        }
+
+        function skipAd(adId) {
+            document.getElementById(adId).style.display = 'none';
         }
 
         async function likePost(fileName) {
@@ -168,7 +286,87 @@
             loadFeed();
         }
 
-        // Initial Load
+        async function loadFeed() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = "Loading feed...";
+            try {
+                const res = await fetch('/api/videos');
+                const data = await res.json();
+                allVideos = data.videos || [];
+                container.innerHTML = "";
+
+                if(allVideos.length > 0) {
+                    allVideos.forEach((v, idx) => {
+                        const avatarHtml = userAvatar ? `<img src="${userAvatar}">` : currentUser[0].toUpperCase();
+                        const adId = `ad_${idx}`;
+                        const isImage = /\.(jpg|jpeg|png|webp)$/i.test(v.file_name);
+
+                        let mediaHtml = isImage ? 
+                            `<img src="${v.url}" class="post-img">` :
+                            `<div class="media-box">
+                                <div class="watermark">🆔 ${currentUser}</div>
+                                <div id="${adId}" class="ad-overlay">
+                                    <button class="skip-btn" onclick="skipAd('${adId}')">Skip Ad ⏭</button>
+                                    <h3>📢 Sponsored Ad</h3>
+                                    <p style="font-size:12px;">Monetization Active</p>
+                                </div>
+                                <video controls preload="metadata" playsinline onplay="initAd('${adId}')">
+                                    <source src="${v.url}" type="video/mp4">
+                                </video>
+                            </div>`;
+
+                        container.innerHTML += `
+                            <div class="post-card">
+                                <div class="post-header">
+                                    <div class="post-user">
+                                        <div class="post-avatar">${avatarHtml}</div>
+                                        <span>${currentUser}</span>
+                                    </div>
+                                    <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+                                </div>
+                                ${mediaHtml}
+                                <div class="post-actions">
+                                    <div class="actions-left">
+                                        <span onclick="likePost('${v.file_name}')">🤍 ${v.likes}</span>
+                                        <span>💬</span>
+                                        <span>✈️</span>
+                                    </div>
+                                    <span>🔖</span>
+                                </div>
+                                <div class="views-count">👀 1,420 views</div>
+                                <div class="post-meta"><b>${currentUser}</b> Vibe check 🔥 #SquidVibe</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = "<p style='text-align:center; color:#8e8e8e;'>No posts yet. Tap ➕ to upload!</p>";
+                }
+            } catch(e) {
+                container.innerHTML = "<p style='text-align:center; color:red;'>Failed to load feed.</p>";
+            }
+        }
+
+        function loadProfile() {
+            document.getElementById('userPostCount').innerText = allVideos.length;
+            const grid = document.getElementById('profileGrid');
+            grid.innerHTML = "";
+            allVideos.forEach(v => {
+                const isImg = /\.(jpg|jpeg|png|webp)$/i.test(v.file_name);
+                grid.innerHTML += `<div class="grid-item">${isImg ? `<img src="${v.url}">` : `<video><source src="${v.url}"></video>`}</div>`;
+            });
+        }
+
+        function toggleFollow(btn) {
+            if(btn.innerText === "Follow") {
+                btn.innerText = "Following";
+                btn.classList.add("following");
+            } else {
+                btn.innerText = "Follow";
+                btn.classList.remove("following");
+            }
+        }
+
+        // Initial load
         loadFeed();
     </script>
 </body>
