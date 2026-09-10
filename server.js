@@ -15,12 +15,20 @@ const s3 = new AWS.S3({
 
 const BUCKET_NAME = 'squid-vibe-storage-2026';
 
-// 1. Upload URL Generator with strict video/mp4 format
+// Upload URL with Privacy & Adult Content Filter Check
 app.post('/api/get-upload-url', async (req, res) => {
     try {
-        const { filename } = req.body;
+        const { filename, privacy } = req.body;
+        
+        // Anti-NSFW / Adult Content keyword check restriction
+        const lowerName = filename.toLowerCase();
+        const restrictedWords = ['porn', 'sex', 'adult', 'xxx', 'nsfw', 'bubu'];
+        if(restrictedWords.some(word => lowerName.includes(word))) {
+            return res.status(400).json({ success: false, error: "Adult/NSFW content is strictly restricted!" });
+        }
+
         const cleanName = filename.replace(/[^a-zA-Z0-9_.-]/g, '_');
-        const key = `uploads/${Date.now()}_${cleanName}`;
+        const key = `uploads/${Date.now()}_${privacy || 'public'}_${cleanName}`;
         
         const s3Params = {
             Bucket: BUCKET_NAME,
@@ -36,30 +44,20 @@ app.post('/api/get-upload-url', async (req, res) => {
     }
 });
 
-// 2. Delete Video API
-app.post('/api/delete', async (req, res) => {
-    try {
-        const { file_name } = req.body;
-        await s3.deleteObject({ Bucket: BUCKET_NAME, Key: file_name }).promise();
-        res.json({ success: true, message: "Deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// 3. Fetch ONLY Video Files (Filtering out non-video formats)
+// Fetch Feed Videos
 app.get('/api/videos', async (req, res) => {
     try {
         const data = await s3.listObjectsV2({ Bucket: BUCKET_NAME, Prefix: 'uploads/' }).promise();
         let videos = data.Contents.map(item => {
             if (item.Key === 'uploads/') return null;
-            
-            // Accept only video formats
             const isVideo = /\.(mp4|mov|webm|m4v|avi)$/i.test(item.Key);
             if (!isVideo) return null;
 
+            const isPrivate = item.Key.includes('_private_');
+            if(isPrivate) return null; // Hide private posts from public feed
+
             const url = `https://${BUCKET_NAME}.s3.eu-north-1.amazonaws.com/${item.Key}`;
-            return { file_name: item.Key, url: url };
+            return { file_name: item.Key, url: url, privacy: 'Public' };
         }).filter(Boolean);
 
         res.json({ success: true, videos });
@@ -69,4 +67,4 @@ app.get('/api/videos', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Squid Vibe Pro running on port ${PORT}`));
