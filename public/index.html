@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squid Vibe - Instagram Experience</title>
+    <title>Squid Vibe Pro - Instagram Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Billabong&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background: #fafafa; color: #262626; margin: 0; padding-bottom: 70px; }
@@ -29,8 +29,8 @@
         .follow-btn { background: #0095f6; color: #fff; border: none; padding: 4px 14px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; }
         .follow-btn.following { background: #efefef; color: #262626; }
 
+        /* Instagram Professional Media Box & Video Player */
         .media-box { position: relative; width: 100%; background: #000; min-height: 300px; display: flex; align-items: center; justify-content: center; }
-        /* Optimized to prevent heavy buffering lag */
         video { width: 100%; max-height: 500px; object-fit: contain; display: block; background: #000; outline: none; }
         .watermark { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; backdrop-filter: blur(4px); z-index: 5; }
 
@@ -282,8 +282,8 @@
                             `<img src="${v.url}" class="post-img">` :
                             `<div class="media-box">
                                 <div class="watermark">🆔 ${currentUser}</div>
-                                <!-- Optimized stream handler to bypass heavy buffering -->
-                                <video controls preload="metadata" playsinline muted onloadedmetadata="this.muted=false">
+                                <!-- Instagram Professional Video Pipeline: Uses auto-load with direct stream pipeline -->
+                                <video controls autoplay muted playsinline loop oncanplay="this.muted=false">
                                     <source src="${v.url}" type="video/mp4">
                                     Your browser does not support video playback.
                                 </video>
