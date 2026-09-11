@@ -321,6 +321,7 @@
 
         function closeStoryViewer() { document.getElementById('storyModal').style.display = 'none'; }
 
+        // STABLE PUBLISH FUNCTION (PREVENTS ACCIDENTAL WINDOW CLOSE)
         async function publishMedia() {
             const fileInput = document.getElementById('mediaFile');
             const status = document.getElementById('uploadStatus');
@@ -328,7 +329,7 @@
             const privacy = document.getElementById('privacySelect').value;
             const music = document.getElementById('musicSelect').value;
             
-            if(fileInput.files.length === 0) { alert('Please select a file!'); return; }
+            if(fileInput.files.length === 0) { alert('Please select a file first!'); return; }
 
             const file = fileInput.files[0];
             const reader = new FileReader();
@@ -339,13 +340,13 @@
                     uploadStory(e.target.result, file.type.includes('image') ? 'img' : 'video');
                     status.innerText = "Published Successfully! 🎉";
                     fileInput.value = '';
-                    setTimeout(() => switchView('feed'), 1000);
+                    setTimeout(() => switchView('feed'), 1500);
                 };
                 reader.readAsDataURL(file);
                 return;
             }
 
-            status.innerText = "Preparing cloud upload...";
+            status.innerText = "Connecting to Cloud Studio...";
             try {
                 const res = await fetch('/api/get-upload-url', {
                     method: 'POST',
@@ -366,9 +367,13 @@
                     status.innerText = "Published Successfully! 🎉";
                     fileInput.value = '';
                     document.getElementById('captionInput').value = '';
-                    setTimeout(() => switchView('feed'), 1000);
-                } else { status.innerText = "Cloud upload failed."; }
-            } catch(e) { status.innerText = "Error: " + e.message; }
+                    setTimeout(() => switchView('feed'), 1500);
+                } else { 
+                    status.innerText = "Cloud upload failed."; 
+                }
+            } catch(e) { 
+                status.innerText = "Error: " + e.message; 
+            }
         }
 
         async function likePost(fileName) {
